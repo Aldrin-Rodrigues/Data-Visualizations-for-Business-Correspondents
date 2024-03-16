@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>map</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+  <body>
+    <form id="filters">
+        <label for="crop">Crop:</label>
+        <input type="text" id="crop" name="crop">
+    
+        <label for="season">Season:</label>
+        <input type="text" id="season" name="season">
+    
+        <label>
+            <input type="checkbox" id="areaCheckbox" name="areaCheckbox"> Area
+        </label>
+    
+        <label>
+            <input type="checkbox" id="productionCheckbox" name="productionCheckbox"> Production
+        </label>
+    
+        <button type="submit">Apply Filters</button>
+    </form>
+
+    <div id="map-container"></div>
+    <script src="/static/js/map.js"></script>
+  </body>
+</html>

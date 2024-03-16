@@ -1,0 +1,58 @@
+
+body{
+    background-image: url('/static/components/homepage_bg.jpg');
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    }
+      
+.maindiv {
+    background-color: rgba(255, 255, 255, 0.35);
+    background-position: center;
+    padding: 50px;
+    /* margin: 20px; */
+    color: #000000; 
+    display: flex;
+    /* min-height: 100vh; */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    left: 100px;
+}
+
+.predictdiv {
+    background-color: rgba(255, 255, 255, 0.35);
+    padding: 50px;
+    color: #000000; 
+    border-radius: 10px;
+    width: 90%;
+}
+
+.btn {
+    background-color: #86ab87; /* green */
+    color: white; /* white text */
+    border: none; /* no border */
+    padding: 15px 32px; /* vertical padding of 15px, horizontal padding of 32px */
+    text-align: center; /* center the text */
+    text-decoration: none; /* remove underline */
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer; /* change cursor to pointer when hovering over the button */
+}
+
+.bottom-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* gap: 10px; */
+    /* margin-left: 55px; */
+    /* margin-right: 55px; */
+    margin: 0 auto;
+    width: 90%;
+    background-color: rgba(255, 255, 255, 0.35);
+    color: #000000; 
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 10px;
+}
