@@ -11,5 +11,9 @@ def home():
 def visualize():
     return render_template('/views/map.html')
 
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('/views/map2.html')
+
 if __name__ == "__main__":
     app.run(debug=True)
