@@ -1,26 +1,30 @@
 document.addEventListener("DOMContentLoaded", function() {
   const mapContainer = d3.select("#map-container");
-const width = +mapContainer.style("width").slice(0, -2);
-const height = 600;
+const width = 800
+const height = 800;
 let geojsonData;
+let path;
 
-//Projection for the map
-const projection = d3
-.geoMercator()
-.scale(1000)
-.center([81, 23])
-.translate([width / 2, height / 2]);
+// //Projection for the map
+// const projection = d3
+//   .geoMercator()
+//   .scale(1000)
+//   .center([81, 23])
+//   .translate([width / 2, height / 2]);
 
-//Path generator
-const path = d3.geoPath().projection(projection);
+// //Path generator
+// const path = d3.geoPath().projection(projection);
 
-console.log("Path:", path);
+// console.log("Path:", path);
 
 //Load geojson data
 // Load GeoJSON data
 d3.json("/static/data/india_district.geojson").then(function(geojson) {
 
   geojsonData=geojson;
+  const projection = d3.geoMercator().fitSize([width, height], geojsonData);
+  path = d3.geoPath().projection(projection);
+
   // Create SVG container
   const svg = d3.select("#map-container")
                 .append("svg")
@@ -62,11 +66,12 @@ console.log("Data:", data);
 function addLegend(colorScale) {
   // Remove existing legend if any
   d3.select("#legend-container").remove();
-
   // Create a new legend container
-  const legendContainer = d3.select("#map-container").append("div").attr("id", "legend-container");
+  const legendContainer = d3.select(".formdiv").append("div").attr("id", "legend-container");
 
-  const legendTitle = legendContainer.append("h3").text("Legend");
+  const legendTitle = legendContainer.append("h3")
+  .text("Legend")
+  .style("margin-top", "20px");
   const legend = legendContainer.append("svg").attr("width", 100).attr("height", 100);
   const legendWidth = 20;
   const legendHeight = 20;
@@ -92,7 +97,7 @@ function addLegend(colorScale) {
 
 function updateMap(geojson,filteredData, areaInput, productionInput) {
   //remove existing map elements
-  d3.select("svg").remove();
+  d3.select("#map-container").select("svg").remove();
 
   //Render map
   const svg = mapContainer
@@ -149,13 +154,26 @@ function updateMap(geojson,filteredData, areaInput, productionInput) {
     })
     .attr("stroke", "black")
     .attr("stroke-width", 0.5)
-    .on("mouseover", function (d) {
+    .on("mouseover", function (event, d) {
+      event.stopPropagation();
+      const districtName = event.target.__data__.properties.NAME_2;
+      const stateName = event.target.__data__.properties.NAME_1;
       d3.select(this).attr("stroke", "black").attr("stroke-width", 2);
+      console.log("event", event);
+      console.log("d", d);
+          d3.select("#map-container")
+          .append("div")
+          .attr("class", "popup")
+          .html(`<strong>District: ${districtName}<br><strong>State:</strong> ${stateName}`) // Display "Hello" text
+          .style("left", event.pageX + "px") // Set popup position
+          .style("top", event.pageY + "px");
     })
-    .on("mouseout", function (d) {
+    .on("mouseleave", function (d) {
       d3.select(this).attr("stroke", "black").attr("stroke-width", 0.5);
+      d3.select(".popup").remove();
       });
 
+    
     //Add legend
       addLegend(colorScale);
 }
@@ -176,10 +194,11 @@ d3.select("#filters").on("submit", function (event) {
   console.log("Area Input:", areaInput);
 
   // Perform filtering
- /*let filteredData = data.filter((d) => 
-      d.Crop.toLowerCase().trim() === crop && 
-      d.Season.toLowerCase().trim() === season
-  );*/
+  // let filteredData = data.filter((d) => 
+  //     d.Crop.toLowerCase().trim() === crop && 
+  //     d.Season.toLowerCase().trim() === season
+  // );
+
   let filteredData = data.filter((d) => {
     if (crop && season) {
         return d.Crop.toLowerCase().trim() === crop && 
@@ -194,6 +213,9 @@ d3.select("#filters").on("submit", function (event) {
     }
 });
 
+
+
+
   console.log("Filtered Data:", filteredData);
   updateMap(geojsonData, filteredData, areaInput, productionInput);
 
@@ -203,3 +225,4 @@ d3.select("#filters").on("submit", function (event) {
 
 
 });
+
