@@ -142,37 +142,35 @@ Promise.all([
 
       // Update the map
       d3.selectAll("path") // Select all paths (districts) in the map
-           .style("fill", function (d) {
-          const district = d.properties.NAME_2.toLowerCase(); // Get the name of the district and convert to lowercase
-          const bcCount = districtBCCounts[district]; // Get the count of BCs in the district
-          console.log("District:", district, "BC Count:", bcCount);
-          return bcCount ? colorScale(bcCount) : "white"; // If count exists, use color scale; otherwise, use gray
-        })
-        .on("mouseover", function(d) {
-          const district = d.properties.NAME_2.toLowerCase();
-          const bcCount = districtBCCounts[district] || 0; // Default to 0 if count is undefined
-          const bcs = districtBCNames[district] || []; // Default to empty array if BC names are undefined
-  
-          // Position the popup near the mouse cursor
-          const [x, y] = d3.mouse(this.parentNode);
-          const popupX = x + 10; // Adjust popup position
-          const popupY = y - 10; // Adjust popup position
-  
-          // Create and display the popup
-          d3.select("#map")
-              .append("div")
-              .attr("class", "popup")
-              .style("left", popupX + "px")
-              .style("top", popupY + "px")
-              .html(`<strong>District:</strong> ${district}<br>
-                     <strong>BC Count:</strong> ${bcCount}<br>
-                     <strong>BC Names:</strong> ${bcs.join(", ")}`);
-      })
-      // Add mouseout event listener
-      .on("mouseout", function() {
-          // Remove the popup on mouseout
-          d3.select(".popup").remove();
-      });
+          .data(geojsonData.features)
+          .on("mouseover", function(event,d) {
+            // Append popup with "Hello" text
+            const districtName = event.target.__data__.properties.NAME_2;
+            const stateName = event.target.__data__.properties.NAME_1;
+            console.log("event", event);
+              console.log("d", d);
+            d3.select("#map")
+            .append("div")
+            .attr("class", "popup")
+            .html(`<strong>District: ${districtName}<br><strong>State:</strong> ${stateName}`) // Display "Hello" text
+            .style("left", event.pageX + "px") // Set popup position
+            .style("top", event.pageY + "px");
+            })
+          // Add mouseout event listener
+          .on("mouseout", function() {
+              d3.select(".popup").remove();
+              
+          })
+      
+          .style("fill", function (d) {
+              const district = d.properties.NAME_2.toLowerCase(); // Get the name of the district and convert to lowercase
+              const bcCount = districtBCCounts[district]; // Get the count of BCs in the district
+              console.log("District:", district, "BC Count:", bcCount);
+              return bcCount ? colorScale(bcCount) : "white"; // If count exists, use color scale; otherwise, use gray
+        });
+
+      
+        
 
 
         addLegend(colorScale);
