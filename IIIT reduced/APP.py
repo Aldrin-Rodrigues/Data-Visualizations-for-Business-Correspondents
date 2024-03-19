@@ -15,5 +15,17 @@ def visualize():
 def index():
     return render_template('/views/map2.html')
 
+@app.route('/Pincode', methods=['GET'])
+def Pincode():
+    return render_template('/views/openstreetmap.html')
+
+@app.route('/BCsearch', methods=['GET'])
+def BCsearch():
+    return render_template('/views/BCSearch.html')
+
+@app.route('/BCTracker', methods=['GET'])
+def BCTracker():
+    return render_template('/views/BCTracker.html')
+
 if __name__ == "__main__":
     app.run(debug=True)
