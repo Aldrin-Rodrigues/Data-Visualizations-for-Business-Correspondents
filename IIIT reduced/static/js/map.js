@@ -67,11 +67,11 @@ function addLegend(colorScale) {
   // Remove existing legend if any
   d3.select("#legend-container").remove();
   // Create a new legend container
-  const legendContainer = d3.select(".formdiv").append("div").attr("id", "legend-container");
+  const legendContainer = d3.select(".formdiv2").append("div").attr("id", "legend-container");
 
   const legendTitle = legendContainer.append("h3")
   .text("Legend")
-  .style("margin-top", "20px");
+  .style("margin-top", "20px")
   const legend = legendContainer.append("svg").attr("width", 100).attr("height", 100);
   const legendWidth = 20;
   const legendHeight = 20;
@@ -85,17 +85,18 @@ function addLegend(colorScale) {
       .append("rect")
       .attr("width", legendWidth)
       .attr("height", legendHeight)
-      .attr("fill", colorScale);
+      .attr("fill", colorScale)
+      .attr("stroke", "black")
   legendItems
       .append("text")
       .text((d) => d)
       .attr("x", legendWidth + 5)
       .attr("y", legendHeight / 2)
-      .attr("dy", "0.35em");
+      .attr("dy", "0.35em")
 }
 
 
-function updateMap(geojson,filteredData, areaInput, productionInput) {
+function updateMap(geojson,filteredData, areaThreshold, productionThreshold) {
   //remove existing map elements
   d3.select("#map-container").select("svg").remove();
 
@@ -108,15 +109,15 @@ function updateMap(geojson,filteredData, areaInput, productionInput) {
     .attr("stroke", "black");
 
 
-  const areaByDistrict = d3.rollup(filteredData, 
-      v => d3.sum(v, d => d.Area), 
-      d => d.District_Name
-  );
+  // const areaByDistrict = d3.rollup(filteredData, 
+  //     v => d3.sum(v, d => d.Area), 
+  //     d => d.District_Name
+  // );
 
-  console.log("Area by District:", areaByDistrict);
+  // console.log("Area by District:", areaByDistrict);
 
   const colorScale = d3.scaleSequential(d3.interpolateBlues)
-      .domain([0, d3.max(areaByDistrict.values())]);
+      .domain([0, d3.max(filteredData, d => d.Production)]);
 
       console.log("Color Scale Domain:", colorScale.domain());
 
@@ -132,26 +133,32 @@ function updateMap(geojson,filteredData, areaInput, productionInput) {
       const featureData = filteredData.find(
           (item) => item.District_Name.toLowerCase() === d.properties.NAME_2.toLowerCase()
       );
-
-
-
-
-      //Check if data exists for that feature
-      if (featureData) {
-        //Calculate area, production, or ratio based on user input
-        if (areaInput && productionInput) {
-          value = featureData.Production / featureData.Area; //Ratio
-        } else if (areaInput) {
-          value = featureData.Area;
-        } else if (productionInput) {
-          value = featureData.Production;
-        }
-        return colorScale(value);
-      } else {
-        //If no data found, return lightgray
+      if (featureData && featureData.Area >= areaThreshold && featureData.Production >= productionThreshold) {
+        return colorScale(featureData.Production);
+          } 
+          else {
+        // If no data found or it doesn't meet the thresholds, return light gray
         return "white";
-      }
-    })
+          }
+})
+
+
+    //   //Check if data exists for that feature
+    //   if (featureData) {
+    //     //Calculate area, production, or ratio based on user input
+    //     if (areaInput && productionInput) {
+    //       value = featureData.Production / featureData.Area; //Ratio
+    //     } else if (areaInput) {
+    //       value = featureData.Area;
+    //     } else if (productionInput) {
+    //       value = featureData.Production;
+    //     }
+    //     return colorScale(value);
+    //   } else {
+    //     //If no data found, return lightgray
+    //     return "white";
+    //   }
+    // })
     .attr("stroke", "black")
     .attr("stroke-width", 0.5)
     .on("mouseover", function (event, d) {
@@ -184,14 +191,18 @@ d3.select("#filters").on("submit", function (event) {
   console.log("Form Submitted");
   event.preventDefault(); // Prevent default form submission behavior
 
+  // const crop = d3.select("#crop").node().value.trim().toLowerCase();
+  // const season = d3.select("#season").node().value.trim().toLowerCase();
+  // const areaInput = d3.select("#areaCheckbox").node().checked;
+  // const productionInput = d3.select("#productionCheckbox").node().checked;
   const crop = d3.select("#crop").node().value.trim().toLowerCase();
   const season = d3.select("#season").node().value.trim().toLowerCase();
-  const areaInput = d3.select("#areaCheckbox").node().checked;
-  const productionInput = d3.select("#productionCheckbox").node().checked;
+  const areaThreshold = parseFloat(document.getElementById("area").value);
+  const productionThreshold = parseFloat(document.getElementById("production").value);
 
   console.log("Crop:", crop);
   console.log("Season:", season);
-  console.log("Area Input:", areaInput);
+  console.log("Area Input:", areaThreshold);
 
   // Perform filtering
   // let filteredData = data.filter((d) => 
@@ -199,30 +210,31 @@ d3.select("#filters").on("submit", function (event) {
   //     d.Season.toLowerCase().trim() === season
   // );
 
-  let filteredData = data.filter((d) => {
-    if (crop && season) {
-        return d.Crop.toLowerCase().trim() === crop && 
-               d.Season.toLowerCase().trim() === season;
-    } else if (crop) {
-        return d.Crop.toLowerCase().trim() === crop;
-    } else if (season) {
-        return d.Season.toLowerCase().trim() === season;
-    } else {
-        // If neither crop nor season is provided, include all data
-        return true;
-    }
-});
-
-
-
+//   let filteredData = data.filter((d) => {
+//     if (crop && season) {
+//         return d.Crop.toLowerCase().trim() === crop && 
+//                d.Season.toLowerCase().trim() === season;
+//     } else if (crop) {
+//         return d.Crop.toLowerCase().trim() === crop;
+//     } else if (season) {
+//         return d.Season.toLowerCase().trim() === season;
+//     } else {
+//         // If neither crop nor season is provided, include all data
+//         return true;
+//     }
+// });
+let filteredData = data;
+if (crop) {
+    filteredData = filteredData.filter(d => d.Crop === crop);
+}
+if (season) {
+    filteredData = filteredData.filter(d => d.Season === season);
+}
 
   console.log("Filtered Data:", filteredData);
-  updateMap(geojsonData, filteredData, areaInput, productionInput);
-
-
+  updateMap(geojsonData, filteredData, areaThreshold, productionThreshold);
 });
 });
-
 
 });
 
