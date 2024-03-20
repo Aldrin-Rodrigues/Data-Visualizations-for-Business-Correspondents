@@ -80,11 +80,11 @@ body {
           <div class="top-bar ms-auto">
             <span style="color: black;">BUSINESS CORRESPONDENT TRACKER</span>    
         </div>    
-          <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
-            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">Features</a>
-            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">Enterprise</a>
-            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">Support</a>
-            <a class="py-2 link-body-emphasis text-decoration-none" href="#">Pricing</a>
+        <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
+            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/visualize">Visualization</a>
+            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/Pincode">Pincode Mapping</a>
+            <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/BCSearch">BC Search</a>
+            <a class="py-2 link-body-emphasis text-decoration-none" href="#">BC Tracker</a>
           </nav>
     </header>
 
@@ -92,21 +92,22 @@ body {
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
-                    <label for="bankSelect">Select Bank</label>
+                    <label for="bankSelect"><h5>Select Bank</h5></label>
                     <select class="form-select" id="bankSelect" style="font-size: 20px;"></select>
                 </div>
                 <div class="col-md-4">
-                    <label for="stateSelect">Select State</label>
+                    <label for="stateSelect"><h5>Select State</h5></label>
                     <select class="form-select" id="stateSelect" style="font-size: 20px;"></select>
                 </div>
             </div>
             
                 <div class="container">
-                    <h2>Filtered Data:</h2>
+                    <div class="col-md-3 mt-4">
+                    <h5>Filtered Data:</h5>
+                    </div>
                     <ul id="filteredData" ></ul>
                 </div>
                 
-            
         </div>
     </main>
 
