@@ -29,9 +29,10 @@
   
         <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
           <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">Visualization</a>
-          <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">Pincode Mapping</a>
-          <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="#">BC Search</a>
-          <a class="py-2 link-body-emphasis text-decoration-none" href="#">BC Tracker</a>
+          <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/Pincode">Pincode Mapping</a>
+          <a class="me-3 py-2 link-body-emphasis text-decoration-none" href="/BCsearch">BC Search</a>
+          <a class="py-2 link-body-emphasis text-decoration-none" href="/BCTracker">BC Tracker </a>
+          <a class="py-2 link-body-emphasis text-decoration-none" href="/cropCompare">CropCompare</a>
         </nav>
     </header>
     <section>
@@ -54,9 +55,9 @@
               <label for="season">Season</label>
             </div>
 
-            <!-- <label>
+            <label>
                 <input type="checkbox" id="areaCheckbox" name="areaCheckbox"> Area
-            </label> -->
+            </label>
             <!-- <label for="area">Area Threshold:</label>
             <input type="range" id="area" name="area" min="0" max="20000" value="0"><span id="areaValue">0</span><br> -->
             
@@ -64,25 +65,32 @@
               <input class="form-check-input" type="range" id="area" name="area" min="0" max="95674" value="0"><span id="areaValue">0</span><br>
               <label class="form-check-label" for="area">Area</label>
             </div> -->
-            <label for="area" class="form-label">Area</label>
-            <input class="form-range" type="range" id="area" name="area" min="0" max="95674" value="0"><span id="areaValue">0</span><br>
-
-        
-            <!-- <label>
+            <!-- <h5>Area</h5>
+            <input class="form-range" type="range" id="area" name="area" min="0" max="95674" value="0" style="width: 85%;"><br>
+            <span id="areaValue">0</span>
+            <br> -->
+            <label>
                 <input type="checkbox" id="productionCheckbox" name="productionCheckbox"> Production
-              </label> -->
+              </label>
               <!-- <div class="form-check form-switch ">
                 <input class="form-check-input" type="range" id="production" name="production" min="0" max="199785" value="0"><span id="productionValue">0</span><br>
                 <label class="form-check-label" for="production">Production</label>
               </div> -->
               
-            <label for="production" class="form-label">Production</label>
-            <input class="form-range" type="range" id="production" name="production" min="0" max="199785" value="0"><span id="productionValue">0</span><br>
+            <!-- <h5>Production</h5>
+            <input class="form-range" type="range" id="production" name="production" min="0" max="199785" value="0" style="width: 85%;"><br>
+            <span id="productionValue">0</span><br> -->
 
             <!-- <button type="submit">Apply Filters</button> -->
             <div class="pt-2">
               <button type="submit" class="btn btn-secondary">Apply Filters</button>
             </div>
+
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="toggle">
+              <label class="form-check-label" for="flexSwitchCheckDefault">Toggle</label>
+            </div>
+
           </form>
 
           <!-- <div id="legend-container" class="mt-5 pt-5" style="display: none;"></div> -->
@@ -91,6 +99,7 @@
         <div class="col-sm-8" >
           <div id="popup-container" class="popup" style="display: none;"></div>
           <div class="mapContainer" id="map-container"></div>
+          <div class="mapContainer2" id="bar-chart-container"></div>
         </div>
       </div>
     </div>
@@ -122,6 +131,7 @@
             <div class="pt-2">
               <button type="submit" class="btn btn-secondary">Apply Filters</button>
             </div>
+
           </form>
         </div>
 
@@ -136,7 +146,7 @@
 
   <script src="/static/js/map.js"></script>
   <script src="/static/js/map2.js"></script>
-  <script>
+  <!-- <script>
     // Update slider values when changed
     const areaSlider = document.getElementById("area");
     const areaValue = document.getElementById("areaValue");
@@ -151,6 +161,9 @@
     productionSlider.addEventListener("input", function() {
         productionValue.textContent = productionSlider.value;
     });
-</script>
+</script> -->
+  <script>
+    
+  </script>
   </body>
 </html>
