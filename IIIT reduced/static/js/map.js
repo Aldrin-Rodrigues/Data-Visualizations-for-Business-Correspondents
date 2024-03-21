@@ -122,27 +122,18 @@ function updateMap(geojson,filteredData, areaInput, productionInput) {
       .attr("fill", "lightgray")
       .attr("stroke", "black");
 
-// --------------------
-     const areaByDistrict = d3.rollup(filteredData, 
-         v => d3.sum(v, d => d.Area), 
-         d => d.District_Name
-     );
+
+    // const areaByDistrict = d3.rollup(filteredData, 
+    //     v => d3.sum(v, d => d.Area), 
+    //     d => d.District_Name
+    // );
 
     // console.log("Area by District:", areaByDistrict);
 
-    //------------------------
-/*
     const colorScale = d3.scaleSequential(d3.interpolateBlues)
         .domain([0, d3.max(filteredData, d => d.Production)]);
 
         console.log("Color Scale Domain:", colorScale.domain());
-
-*/
-
-const colorScale = d3.scaleSequential(d3.interpolateBlues)
-.domain([0, d3.max(areaByDistrict, d => d.Production)]);
-
-console.log("Color Scale Domain:", colorScale.domain());
 
 
     //Add map paths
