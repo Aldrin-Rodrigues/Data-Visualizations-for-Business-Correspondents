@@ -199,7 +199,7 @@ Promise.all([
 
         console.log("Filtered Data:", filteredData);
         updateMap("#map2", filteredData);
-
+        
       });
 
     // Initial map rendering

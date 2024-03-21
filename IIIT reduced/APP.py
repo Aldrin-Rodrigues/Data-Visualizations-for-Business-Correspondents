@@ -27,5 +27,13 @@ def BCsearch():
 def BCTracker():
     return render_template('/views/BCTracker.html')
 
+@app.route('/test', methods=['GET'])
+def map3():
+    return render_template('/views/map3.html')
+
+@app.route('/cropCompare', methods=['GET'])
+def cropCompare():
+    return render_template('/views/cropCompare.html')
+
 if __name__ == "__main__":
     app.run(debug=True)
