@@ -85,14 +85,14 @@ d3.csv("/static/data/DistrictCropSeasonAreaProduction.csv").then(function (
     const legendTitle = legendContainer.append("h3")
     .text("Legend")
     .style("margin-top", "20px")
-    const legend = legendContainer.append("svg").attr("width", 100).attr("height", 100);
+    const legend = legendContainer.append("svg").attr("width", 200).attr("height", 200);
     const legendWidth = 20;
     const legendHeight = 20;
     const legendPadding = 5;
-    const ticks=5;
+    const ticksCount=7;
     const legendItems = legend
         .selectAll("g")
-        .data(colorScale.ticks(5))
+        .data(colorScale.ticks(ticksCount))
         .join("g")
         .attr("transform", (d, i) => `translate(0, ${i * (legendHeight + legendPadding)})`);
     legendItems
@@ -119,7 +119,7 @@ function updateMap(geojson,filteredData, areaInput, productionInput) {
       .append("svg")
       .attr("width", width)
       .attr("height", height)
-      .attr("fill", "lightgray")
+      .attr("fill", "white")
       .attr("stroke", "black");
 
 
@@ -130,11 +130,39 @@ function updateMap(geojson,filteredData, areaInput, productionInput) {
 
     // console.log("Area by District:", areaByDistrict);
 
-    const colorScale = d3.scaleSequential(d3.interpolateBlues)
-        .domain([0, d3.max(filteredData, d => d.Production)]);
+    //just commmented
+    // const colorScale = d3.scaleSequential(d3.interpolateBlues)
+    //     .domain([0, d3.max(filteredData, d => d.Production)]);
 
-        console.log("Color Scale Domain:", colorScale.domain());
-
+    //     console.log("Color Scale Domain:", colorScale.domain());
+    const areaByDistrict = d3.rollup(filteredData,
+      v => d3.sum(v, d => d.Area),
+      d => d.District_Name
+      );
+      
+      // console.log("Area by District:", areaByDistrict);
+      
+      const colorScale = d3.scaleSequential(d3.interpolateBlues)
+      .domain([0, d3.max(areaByDistrict.values())]);
+      
+      console.log("Color Scale Domain:", colorScale.domain());
+    
+        //--------------------
+    
+          const prodByDistrict = d3.rollup(filteredData,
+      v => d3.sum(v, d => d.Production),
+      d => d.District_Name
+      );
+      
+      // console.log("prod by District:", prodByDistrict);
+      
+      const colorScaleProd = d3.scaleSequential(d3.interpolateBlues)
+      .domain([0, d3.max(prodByDistrict.values())]);
+      
+      console.log("Color Scale Domain:", colorScaleProd.domain());
+      
+      
+      //-----------
 
     //Add map paths
     svg
@@ -164,10 +192,13 @@ function updateMap(geojson,filteredData, areaInput, productionInput) {
             value = featureData.Production / featureData.Area; //Ratio
           } else if (areaInput) {
             value = featureData.Area;
+            return colorScale(value);
           } else if (productionInput) {
             value = featureData.Production;
+            return colorScaleProd(value);
           }
-          return colorScale(value);
+          // just commented
+          // return colorScale(value);
         } else {
           //If no data found, return lightgray
           return "white";
@@ -202,117 +233,102 @@ function updateMap(geojson,filteredData, areaInput, productionInput) {
 function updateBarChart(data, areaInput, productionInput) {
   // Remove existing bar chart elements
   d3.select("#bar-chart-container").selectAll("*").remove();
- 
+
   // Create SVG container
   const svg = d3.select("#bar-chart-container")
-                  .append("svg")
-                  .attr("width", 800)
-                  .attr("height", 600);
- 
+      .append("svg")
+      .attr("width", 800)
+      .attr("height", 600);
+
   // Define margins
-  const margin = { top: 20, right: 20, bottom: 30, left: 40 };
+  const margin = { top: 120, right: 20, bottom: 120, left: 40 };
   const width = +svg.attr("width") - margin.left - margin.right;
   const height = +svg.attr("height") - margin.top - margin.bottom;
- 
+
   // Define scales
   const x = d3.scaleBand().rangeRound([0, width]).padding(0.7);
   const y = d3.scaleLinear().rangeRound([height, 0]);
-  //x.padding(x.bandwidth()*0.5)
-  
+
   // Define axis
   const xAxis = d3.axisBottom(x);
   const yAxis = d3.axisLeft(y);
- 
+
+  // Sort data based on either area or production
+  if (areaInput) {
+      data.sort((a, b) => b.Area - a.Area); // Sort by area
+  } else {
+      data.sort((a, b) => b.Production - a.Production); // Sort by production
+  }
+
+  // Take only the top 20 entries
+  data = data.slice(0, 20);
+
   // Set the domains
   x.domain(data.map(d => d.District_Name));
   y.domain([0, d3.max(data, d => areaInput ? d.Area : d.Production)]);
-     
+
   // Append the SVG group
   const g = svg.append("g")
-          .attr("transform", `translate(${margin.left},${margin.top})`);
-     
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
   // Append the x-axis
   g.append("g")
-       .attr("class", "x axis")
-       .attr("transform", `translate(0,${height})`)
-       .call(xAxis)
-       .text("Crops");
+      .attr("class", "x axis")
+      .attr("transform", `translate(0,${height})`)
+      .call(xAxis)
+      .selectAll("text")
+      .attr("transform", "rotate(-45)") // Rotate labels for better readability
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".25em")
+      .style("fill", "white"); // Change color to white
+
   // Append the y-axis
   g.append("g")
-       .attr("class", "y axis")
-       .call(yAxis)
-       .append("text")
-       .attr("transform", "rotate(-90)")
-       .attr("y", 6)
-       .attr("dy", "0.71em")
-       .attr("text-anchor", "end")
-       .text(areaInput ? "Area" : "Production");
- 
-  // Create a tooltip div
- // Create a tooltip div outside of the updateBarChart function
-const tooltip = d3.select("body").append("div")
-.attr("class", "tooltip")
-.style("opacity", 0);
+      .attr("class", "y axis")
+      .call(yAxis)
+      .style("font-size", "9px")
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 10)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text(areaInput ? "Area" : "Production")
+      .style("fill", "white"); // Change color to white
 
-// Inside the updateBarChart function, use the tooltip for mouseover events
-g.selectAll(".bar")
-.data(data)
-.enter().append("rect")
-.attr("class", "bar")
-.attr("x", d => x(d.District_Name))
-.attr("width", x.bandwidth() * 3)
-.attr("y", d => y(areaInput ? d.Area : d.Production))
-.attr("height", d => height - y(areaInput ? d.Area : d.Production))
-.attr("fill", "#0047AB") // Set the fill color to blue
-.on("mouseover", function(event, d) {
-tooltip.transition()
-.duration(200)
-.style("opacity", .9);
-tooltip.html(`District: ${d.District_Name}<br>${areaInput ? "Area" : "Production"}: ${areaInput ? d.Area : d.Production}`)
-.style("left", (event.pageX) + "px")
-.style("top", (event.pageY - 28) + "px");
-})
-.on("mousemove", function(event, d) {
-tooltip.style("left", (event.pageX) + "px")
-.style("top", (event.pageY - 28) + "px");
-})
-.on("mouseout", function(d) {
-tooltip.transition()
-.duration(500) // Corrected duration to 500ms for a smoother transition
-.style("opacity", 0); // Corrected opacity to 0 for hiding the tooltip
-});
+  // Create a tooltip div
+  const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
 
   // Append the bars
   g.selectAll(".bar")
-    .data(data)
-    .enter().append("rect")
-    .attr("class", "bar")
-    .attr("x", d => x(d.District_Name))
-    .attr("width", x.bandwidth())
-    .attr("y", d => y(areaInput ? d.Area : d.Production))
-    .attr("height", d => height - y(areaInput ? d.Area : d.Production))
+      .data(data)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", d => x(d.District_Name))
+      .attr("width", x.bandwidth())
+      .attr("y", d => y(areaInput ? d.Area : d.Production))
+      .attr("height", d => height - y(areaInput ? d.Area : d.Production))
+      .attr("fill", "lightblue") // Set the fill color to blue
       .on("mouseover", function(event, d) {
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
-        tooltip.html(`District: ${d.District_Name}<br>${areaInput ? "Area" : "Production"}: ${areaInput ? d.Area : d.Production}`)
-          .style("left", (event.pageX) + "px")
-          .style("top", (event.pageY - 28) + "px");
+          tooltip.transition()
+              .duration(200)
+              .style("opacity", .9);
+          tooltip.html(`District: ${d.District_Name}<br>${areaInput ? "Area" : "Production"}: ${areaInput ? d.Area : d.Production}`)
+              .style("left", (event.pageX) + "px")
+              .style("top", (event.pageY - 28) + "px");
       })
-  
-  .on("mousemove", function(event, d) {
-    tooltip.style("left", (event.pageX + 50) + "px")
-           .style("top", (event.pageY - 28) + "px");
-})
-
-    .on("mouseout", function(d) {
-      tooltip.transition()
-          .duration(500) // Corrected duration to 500ms for a smoother transition
-          .style("opacity", 0); // Corrected opacity to 0 for hiding the tooltip
-  });
-  
- }
-
+      .on("mousemove", function(event, d) {
+          tooltip.style("left", (event.pageX) + "px")
+              .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseout", function(d) {
+          tooltip.transition()
+              .duration(500) // Corrected duration to 500ms for a smoother transition
+              .style("opacity", 0); // Corrected opacity to 0 for hiding the tooltip
+      });
+}
 
 
 
@@ -326,10 +342,7 @@ tooltip.transition()
     const season = d3.select("#season").node().value.trim().toLowerCase();
     const areaInput = d3.select("#areaCheckbox").node().checked;
     const productionInput = d3.select("#productionCheckbox").node().checked;
-    // const crop = d3.select("#crop").node().value.trim().toLowerCase();
-    // const season = d3.select("#season").node().value.trim().toLowerCase();
-    // const areaThreshold = parseFloat(document.getElementById("area").value);
-    // const productionThreshold = parseFloat(document.getElementById("production").value);
+    
 
     console.log("Crop:", crop);
     console.log("Season:", season);
@@ -337,25 +350,7 @@ tooltip.transition()
     console.log("Production Input:", productionInput);
 
 
-    // Perform filtering
-    // let filteredData = data.filter((d) => 
-    //     d.Crop.toLowerCase().trim() === crop && 
-    //     d.Season.toLowerCase().trim() === season
-    // );
-
-  //   let filteredData = data.filter((d) => {
-  //     if (crop && season) {
-  //         return d.Crop.toLowerCase().trim() === crop && 
-  //                d.Season.toLowerCase().trim() === season;
-  //     } else if (crop) {
-  //         return d.Crop.toLowerCase().trim() === crop;
-  //     } else if (season) {
-  //         return d.Season.toLowerCase().trim() === season;
-  //     } else {
-  //         // If neither crop nor season is provided, include all data
-  //         return true;
-  //     }
-  // });
+    
   let filteredData = data;
   
 //---------

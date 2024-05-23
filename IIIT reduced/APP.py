@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, render_template
 
 app=Flask(__name__)
 
-@app.route('/home', methods=['GET'])
+@app.route('/', methods=['GET'])
 def home():
     return render_template('/views/home.html')
 
@@ -11,9 +11,6 @@ def home():
 def visualize():
     return render_template('/views/map.html')
 
-@app.route('/', methods=['GET'])
-def index():
-    return render_template('/views/map2.html')
 
 @app.route('/Pincode', methods=['GET'])
 def Pincode():
@@ -27,9 +24,6 @@ def BCsearch():
 def BCTracker():
     return render_template('/views/BCTracker.html')
 
-@app.route('/test', methods=['GET'])
-def map3():
-    return render_template('/views/map3.html')
 
 @app.route('/cropCompare', methods=['GET'])
 def cropCompare():

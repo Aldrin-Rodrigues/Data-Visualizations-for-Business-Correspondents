@@ -56,17 +56,17 @@ Promise.all([
       // Create a new legend container
       const legendContainer = d3.select(".formdiv").append("div").attr("id", "legend-container2");
       const legendTitle = legendContainer.append("h3").text("Legend");
-      const legend = legendContainer.append("svg").attr("width", 100).attr("height", 100);
+      const legend = legendContainer.append("svg").attr("width", 100).attr("height", 200);
       const legendWidth = 20;
       const legendHeight = 20;
       const legendPadding = 5;
   
       // Specify the number of ticks explicitly to display only whole numbers
-      const ticks = 7 // Adjust the scale domain to fit your data
-  
+      const ticksCount = Math.ceil((colorScale.domain()[1])/7) // Adjust the scale domain to fit your data
+  console.log(colorScale.domain()[1])
       const legendItems = legend
           .selectAll("g")
-          .data(colorScale.ticks(ticks))
+          .data(colorScale.ticks(ticksCount))
           .join("g")
           .attr("transform", (d, i) => `translate(0, ${i * (legendHeight + legendPadding)})`);
   
@@ -158,11 +158,14 @@ Promise.all([
             .html(`<strong>District: ${districtName}<br><strong>State:</strong> ${stateName}<br><strong>BC Count:</strong> ${districtBCCounts[districtName.toLowerCase()]}`) // Display "Hello" text
             .style("left", event.pageX + "px") // Set popup position
             .style("top", event.pageY + "px")
+
             })
+
           // Add mouseout event listener
           .on("mouseout", function() {
               d3.select(this).attr("stroke", "black").attr("stroke-width", 0.5);
-              d3.select('#map2 .popup').remove();
+             d3.select('#map2 .popup').remove();
+            
           })
       
           .style("fill", function (d) {
@@ -171,8 +174,7 @@ Promise.all([
               console.log("District:", district, "BC Count:", bcCount);
               return bcCount ? colorScale(bcCount) : "white"; // If count exists, use color scale; otherwise, use gray
         });
-
-      
+          
         
         addLegend(colorScale);
     }
